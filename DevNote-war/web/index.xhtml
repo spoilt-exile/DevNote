@@ -9,7 +9,11 @@
     <h:body>
         <p:layout fullPage="true" stateful="true">
             <p:layoutUnit position="west" header="Directories" resizable="true">
-                
+                <p:tree value="#{directoryTreeBuilder.root}" var="node" dynamic="true">
+                    <p:treeNode>
+                        <h:outputText value="#{node}" />
+                    </p:treeNode>
+                </p:tree>
             </p:layoutUnit>
             
             <p:layoutUnit position="center">

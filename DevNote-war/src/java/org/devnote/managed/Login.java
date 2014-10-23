@@ -58,6 +58,7 @@ public class Login {
     
     /**
      * Login action. This action checks given login and password and perform user login.
+     * @return result code for navigation ('success' if login performed correctly or 'failed' if not)
      */
     public String login() {
         User findedUser = userBean.findByLogin(currentUser.getLogin());

@@ -49,6 +49,7 @@ import javax.validation.constraints.Size;
 @Table(name = "Directory")
 @NamedQueries({
     @NamedQuery(name = "Directory.findAll", query = "SELECT d FROM Directory d"),
+    @NamedQuery(name = "Directory.findAllSortPath", query = "SELECT d FROM Directory d ORDER BY d.path"),
     @NamedQuery(name = "Directory.findById", query = "SELECT d FROM Directory d WHERE d.id = :id")})
 public class Directory implements Serializable {
     
@@ -206,4 +207,49 @@ public class Directory implements Serializable {
         return "org.devnote.entries.Directory[ id=" + id + " ]";
     }
     
+    /**
+     * Get full name of parent directory.<br/>
+     * <b>Covered by unit test.</b>
+     * @return parent name or empty string if parent is root;
+     */
+    public String getParentFullPath() {
+        int dotIndex = -1;
+        int beginIndex = 0;
+        
+        for (int runIndex = 0; runIndex < path.length(); runIndex++) {
+            char curr = path.charAt(runIndex);
+            if (curr == '.') {
+                dotIndex = runIndex;
+            }
+        }
+        
+        if (dotIndex > 0) {
+            return path.substring(beginIndex, dotIndex);
+        } else {
+            return "";
+        }
+    }
+    
+    /**
+     * Get short name of this directory (without parent path).<br/>
+     * <b>Covered by unit test.</b>
+     * @return short directory name, for example for 'Test1.Test2.Test3', this 
+     * will return only 'Test3'
+     */
+    public String getShortName() {
+        int dotIndex = -1;
+        
+        for (int runIndex = 0; runIndex < path.length(); runIndex++) {
+            char curr = path.charAt(runIndex);
+            if (curr == '.') {
+                dotIndex = runIndex;
+            }
+        }
+        
+        if (dotIndex > 0) {
+            return path.substring(dotIndex + 1);
+        } else {
+            return path;
+        }
+    }
 }

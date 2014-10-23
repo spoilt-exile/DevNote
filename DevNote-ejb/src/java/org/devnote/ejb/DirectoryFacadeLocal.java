@@ -44,4 +44,12 @@ public interface DirectoryFacadeLocal {
 
     int count();
     
+    // My methods
+    
+    /**
+     * Find directories but sorted by path. Useful for creating tree.
+     * @return list of directories sorted by path;
+     */
+    List<Directory> findAllSortByPath();
+    
 }

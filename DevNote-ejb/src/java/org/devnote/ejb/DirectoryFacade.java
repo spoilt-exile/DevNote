@@ -17,9 +17,11 @@
 
 package org.devnote.ejb;
 
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import org.devnote.entries.Directory;
 
 /**
@@ -45,6 +47,11 @@ public class DirectoryFacade extends AbstractFacade<Directory> implements Direct
      */
     public DirectoryFacade() {
         super(Directory.class);
+    }
+
+    @Override
+    public List<Directory> findAllSortByPath() {
+        return this.getEntityManager().createNamedQuery("Directory.findAllSortPath", Directory.class).getResultList();
     }
     
 }
