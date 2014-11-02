@@ -9,17 +9,20 @@
     <h:body>
         <p:layout fullPage="true" stateful="true">
             <p:layoutUnit position="west" header="Directories" resizable="true">
-                <p:tree value="#{directoryTreeBuilder.root}" var="node" dynamic="true">
+                <h:form>
+                <p:tree value="#{directoryTreeBuilder.root}" var="node" dynamic="true" style="border: none;" selectionMode="single" selection="#{directoryTreeBuilder.selected}">
+                    <p:ajax event="select" listener="#{directoryTreeBuilder.onDirSelected}" update=":currentDir"/>
                     <p:treeNode>
                         <h:outputText value="#{node}" />
                     </p:treeNode>
                 </p:tree>
+                </h:form>
             </p:layoutUnit>
             
-            <p:layoutUnit position="center">
-                <p:layout stateful="true">
-                    <p:layoutUnit position="center" header="Notes" style="padding: 0px; border-top: 0px;">
-                        
+            <p:layoutUnit position="center" id="right-frame">
+                <p:layout stateful="true" id="right-container">
+                    <p:layoutUnit position="center" header="Notes" style="padding: 0px; border-top: 0px;" id="notes">
+                        <h:outputText id="currentDir" value="#{directoryTreeBuilder.selected.wrapped.path}" />
                     </p:layoutUnit>
                     
                     <p:layoutUnit position="south" resizable="true">

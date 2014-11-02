@@ -17,16 +17,18 @@
 
 package org.devnote.managed;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
 import org.devnote.ejb.DirectoryFacadeLocal;
 import org.devnote.entries.Directory;
-import org.primefaces.model.DefaultTreeNode;
+import org.devnote.wrappers.primefaces.DirectoryWrapper;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
 
 /**
@@ -34,8 +36,8 @@ import org.primefaces.model.TreeNode;
  * @author Stanislav Nepochatov
  */
 @Named(value = "directoryTreeBuilder")
-@RequestScoped
-public class DirectoryTreeBuilder {
+@SessionScoped
+public class DirectoryTreeBuilder implements Serializable {
     
     /**
      * Directory facade bean.
@@ -49,11 +51,16 @@ public class DirectoryTreeBuilder {
     private TreeNode root;
     
     /**
+     * Current selected directory.
+     */
+    private DirectoryWrapper selected;
+    
+    /**
      * Bean initialization method.
      */
     @PostConstruct
     public void init() {
-        root = new DefaultTreeNode("Root", null);
+        root = new DirectoryWrapper();
         
         Map<String, TreeNode> pathMap = new HashMap<>();
         
@@ -65,15 +72,17 @@ public class DirectoryTreeBuilder {
             String parentName = current.getParentFullPath();
             if (parentName.isEmpty()) {
                 System.err.println("PROCESSING TO ROOT: " + current.getPath());
-                TreeNode insertedToRoot = new DefaultTreeNode(current.getPath(), root);
+                TreeNode insertedToRoot = new DirectoryWrapper(current, root);
                 root.getChildren().add(insertedToRoot);
                 pathMap.put(current.getPath(), insertedToRoot);
+                insertedToRoot.setExpanded(true);
             } else {
                 if (pathMap.containsKey(current.getParentFullPath())) {
                     TreeNode parent = pathMap.get(current.getParentFullPath());
-                    TreeNode insertedInside = new DefaultTreeNode(current.getShortName(), parent);
+                    TreeNode insertedInside = new DirectoryWrapper(current, parent);
                     parent.getChildren().add(insertedInside);
                     pathMap.put(current.getPath(), insertedInside);
+                    insertedInside.setExpanded(true);
                     System.err.println("PROCESSING TO: " + current.getPath() + " -> " + parent);
                 }
             }
@@ -88,4 +97,23 @@ public class DirectoryTreeBuilder {
         return root;
     }
     
+    /**
+     * Get selected directory node.
+     * @return primefaces treenode;
+     */
+    public DirectoryWrapper getSelected() {
+        return selected;
+    }
+    
+    public void setSelected(TreeNode selected) {
+        this.selected = (DirectoryWrapper) selected;
+    }
+    
+    /**
+     * Selected event listener method.
+     * @param e selection from primefaces
+     */
+    public void onDirSelected(NodeSelectEvent e) {
+        this.selected = (DirectoryWrapper) e.getTreeNode();
+    }
 }
