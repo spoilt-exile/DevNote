@@ -5,6 +5,7 @@
         <group>
             <file>file:/home/spoilt/DevelWorks/Java/DevNote/DevNote-war/web/index.xhtml</file>
             <file>file:/home/spoilt/DevelWorks/Java/DevNote/DevNote-war/src/java/org/devnote/managed/DirectoryTreeBuilder.java</file>
+            <file>file:/home/spoilt/DevelWorks/Java/DevNote/DevNote-war/src/java/org/devnote/wrappers/primefaces/DirectoryWrapper.java</file>
         </group>
     </open-files>
 </project-private>

@@ -28,7 +28,6 @@ import javax.inject.Named;
 import org.devnote.ejb.DirectoryFacadeLocal;
 import org.devnote.entries.Directory;
 import org.devnote.wrappers.primefaces.DirectoryWrapper;
-import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
 
 /**
@@ -107,13 +106,5 @@ public class DirectoryTreeBuilder implements Serializable {
     
     public void setSelected(TreeNode selected) {
         this.selected = (DirectoryWrapper) selected;
-    }
-    
-    /**
-     * Selected event listener method.
-     * @param e selection from primefaces
-     */
-    public void onDirSelected(NodeSelectEvent e) {
-        this.selected = (DirectoryWrapper) e.getTreeNode();
     }
 }

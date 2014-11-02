@@ -2,16 +2,20 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     <h:head>
         <title>#DevNote v0.1 Main</title>
     </h:head>
     <h:body>
         <p:layout fullPage="true" stateful="true">
+            
+            <!-- Directory tree section -->
             <p:layoutUnit position="west" header="Directories" resizable="true">
                 <h:form>
-                <p:tree value="#{directoryTreeBuilder.root}" var="node" dynamic="true" style="border: none;" selectionMode="single" selection="#{directoryTreeBuilder.selected}">
-                    <p:ajax event="select" listener="#{directoryTreeBuilder.onDirSelected}" update=":currentDir"/>
+                <p:tree value="#{directoryTreeBuilder.root}" var="node" dynamic="true" style="border: none;" selectionMode="single">
+                    <p:ajax event="select" listener="#{eventHandler.onDirSelected}" update=":currentDirTable, :currentNote"/>
                     <p:treeNode>
                         <h:outputText value="#{node}" />
                     </p:treeNode>
@@ -19,14 +23,57 @@
                 </h:form>
             </p:layoutUnit>
             
-            <p:layoutUnit position="center" id="right-frame">
-                <p:layout stateful="true" id="right-container">
-                    <p:layoutUnit position="center" header="Notes" style="padding: 0px; border-top: 0px;" id="notes">
-                        <h:outputText id="currentDir" value="#{directoryTreeBuilder.selected.wrapped.path}" />
+            <p:layoutUnit position="center">
+                
+                <!-- Note table section -->
+                <p:layout stateful="true">
+                    <p:layoutUnit position="center" header="Notes" style="padding: 0px; border-top: 0px;">
+                        <h:form id="currentDirTable">
+                            <p:dataTable var="note" selectionMode="single" value="#{eventHandler.currentDir.wrapped.noteList}" rowKey="#{note.id}" resizableColumns="true" emptyMessage="No notes.">
+                                <p:ajax event="rowSelect" update=":currentNote" listener="#{eventHandler.onNoteSelected}"/>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Header" />
+                                    </f:facet>
+                                    <h:outputText value="#{note.header}"/>  
+                                </p:column>
+                                
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Last save date" />
+                                    </f:facet>
+                                    <h:outputText value="#{note.lastVersionDate}"/>  
+                                </p:column>
+                                
+                            </p:dataTable>
+                        </h:form>
                     </p:layoutUnit>
                     
+                    <!-- View/edit section -->
                     <p:layoutUnit position="south" resizable="true">
-                        
+                        <h:form id="currentNote">
+                            <h:outputText value="Edit  " />
+                            <p:inputSwitch value="#{eventHandler.enableEdit}">
+                                <p:ajax update="currentNote"/>
+                            </p:inputSwitch>
+                            
+                            <c:choose>
+                                
+                                <!-- Editor section -->
+                                <c:when test="#{eventHandler.enableEdit}">
+                                    <br/>
+                                    <br/>
+                                    <p:editor value="#{eventHandler.currentText}" />
+                                </c:when>
+                                
+                                <!-- View section -->
+                                <c:otherwise>
+                                    <br/>
+                                    <br/>
+                                    <h:outputText value="#{eventHandler.currentText}" escape="false"/>
+                                </c:otherwise>
+                            </c:choose>
+                        </h:form>
                     </p:layoutUnit>
                 </p:layout>
             </p:layoutUnit>
