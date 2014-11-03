@@ -20,6 +20,7 @@ package org.devnote.managed;
 import java.io.Serializable;
 import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.event.ValueChangeEvent;
 import javax.inject.Named;
 import org.devnote.ejb.NoteFacadeLocal;
 import org.devnote.ejb.VersionFacadeLocal;
@@ -63,6 +64,11 @@ public class EventHandler implements Serializable {
      * Current browsed version of note.
      */
     private Version currentVersion;
+    
+    /**
+     * Current browsed version id.
+     */
+    private int currentVersionId;
     
     /**
      * Editor form visibility flag.
@@ -134,6 +140,22 @@ public class EventHandler implements Serializable {
     }
     
     /**
+     * Get current version id.
+     * @return id of current browsed version;
+     */
+    public int getCurrentVersionId() {
+        return currentVersionId;
+    }
+
+    /**
+     * Set current version id.
+     * @param currentVersionId id to set;
+     */
+    public void setCurrentVersionId(int currentVersionId) {
+        this.currentVersionId = currentVersionId;
+    }
+    
+    /**
      * Directory node selection event listener method.
      * @param e selection from primefaces;
      */
@@ -156,6 +178,14 @@ public class EventHandler implements Serializable {
     }
     
     /**
+     * Version entry selection event listener method.
+     * @param e selection from primefaces;
+     */
+    public void onVersionSelected(ValueChangeEvent e) {
+        this.currentVersion = versionBean.find(this.currentVersionId);
+    }
+    
+    /**
      * Get text for note display.
      * @return text of current selected version;
      */
@@ -164,6 +194,18 @@ public class EventHandler implements Serializable {
             return this.currentVersion.getNoteText();
         } else {
             return "Choose note.";
+        }
+    }
+    
+    /**
+     * Get text for note edit.
+     * @return text of current selected version;
+     */
+    public String getCurrentEditText() {
+        if (this.currentVersion != null) {
+            return versionBean.find(this.currentNote.getLastVersionId().getId()).getNoteText();
+        } else {
+            return "";
         }
     }
 }

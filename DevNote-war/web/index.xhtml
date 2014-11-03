@@ -52,10 +52,16 @@
                     <!-- View/edit section -->
                     <p:layoutUnit position="south" resizable="true">
                         <h:form id="currentNote">
-                            <h:outputText value="Edit  " />
+                            <h:outputLabel value="Edit " />
                             <p:inputSwitch value="#{eventHandler.enableEdit}">
                                 <p:ajax update="currentNote"/>
                             </p:inputSwitch>
+                            
+                            <h:outputLabel value="Version " for="versionChoose"/>
+                            <p:selectOneMenu id="versionChoose" value="#{eventHandler.currentVersionId}">
+                                <f:selectItems value="#{eventHandler.currentNote.versionList}" var="version" itemLabel="#{version.saveDate}" itemValue="#{version.id}"/>
+                                <p:ajax event="change" update="currentNote" listener="#{eventHandler.onVersionSelected(e)}"/>
+                            </p:selectOneMenu>
                             
                             <c:choose>
                                 
@@ -63,7 +69,7 @@
                                 <c:when test="#{eventHandler.enableEdit}">
                                     <br/>
                                     <br/>
-                                    <p:editor value="#{eventHandler.currentText}" />
+                                    <p:editor value="#{eventHandler.currentEditText}" />
                                 </c:when>
                                 
                                 <!-- View section -->
