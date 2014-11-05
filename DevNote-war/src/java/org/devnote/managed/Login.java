@@ -68,7 +68,7 @@ public class Login {
                 FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("isAdmin", "true");
             }
             userBean.performLogin(findedUser);
-            session.setCurrentUser(currentUser);
+            session.setCurrentUser(findedUser);
             return "success";
         } else {
             FacesContext.getCurrentInstance().addMessage("login-error", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login error, check your login and password!", ""));

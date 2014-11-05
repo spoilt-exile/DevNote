@@ -57,23 +57,26 @@
                                 <p:ajax update="currentNote"/>
                             </p:inputSwitch>
                             
-                            <h:outputLabel value="Version " for="versionChoose"/>
-                            <p:selectOneMenu id="versionChoose" value="#{eventHandler.currentVersionId}">
-                                <f:selectItems value="#{eventHandler.currentNote.versionList}" var="version" itemLabel="#{version.saveDate}" itemValue="#{version.id}"/>
-                                <p:ajax event="change" update="currentNote" listener="#{eventHandler.onVersionSelected(e)}"/>
-                            </p:selectOneMenu>
-                            
                             <c:choose>
                                 
                                 <!-- Editor section -->
                                 <c:when test="#{eventHandler.enableEdit}">
                                     <br/>
+                                    <p:inputText value="#{eventHandler.currentEditHeader}" required="true" requiredMessage="Enter note header!"/>
                                     <br/>
-                                    <p:editor value="#{eventHandler.currentEditText}" />
+                                    <p:editor value="#{eventHandler.currentEditText}" required="true" requiredMessage="Can't save empty note!"/>
+                                    <br/>
+                                    <p:commandButton action="#{eventHandler.saveNewVersion()}" value="Save" update="currentNote, :currentDirTable"/>
+                                    <p:commandButton action="#{eventHandler.dropNewVersion()}" value="Cancel" update="currentNote"/>
                                 </c:when>
                                 
                                 <!-- View section -->
                                 <c:otherwise>
+                                    <h:outputLabel value="Version " for="versionChoose"/>
+                                    <p:selectOneMenu id="versionChoose" value="#{eventHandler.currentVersionId}">
+                                        <f:selectItems value="#{eventHandler.currentNote.versionList}" var="version" itemLabel="#{version.saveDate}" itemValue="#{version.id}"/>
+                                        <p:ajax event="change" update="currentNote" listener="#{eventHandler.onVersionSelected(e)}"/>
+                                    </p:selectOneMenu>
                                     <br/>
                                     <br/>
                                     <h:outputText value="#{eventHandler.currentText}" escape="false"/>

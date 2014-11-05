@@ -18,14 +18,20 @@
 package org.devnote.managed;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.bean.ManagedProperty;
 import javax.faces.event.ValueChangeEvent;
+import javax.inject.Inject;
 import javax.inject.Named;
+import org.devnote.ejb.DirectoryFacadeLocal;
 import org.devnote.ejb.NoteFacadeLocal;
 import org.devnote.ejb.VersionFacadeLocal;
+import org.devnote.entries.Directory;
 import org.devnote.entries.Note;
 import org.devnote.entries.Version;
+import org.devnote.service.Hash;
 import org.devnote.wrappers.primefaces.DirectoryWrapper;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
@@ -51,6 +57,19 @@ public class EventHandler implements Serializable {
     private VersionFacadeLocal versionBean;
     
     /**
+     * Directory ejb facade.
+     */
+    @EJB
+    private DirectoryFacadeLocal directoryBean;
+    
+    /**
+     * User session managed bean.
+     */
+    @ManagedProperty(value="#{userSession}")
+    @Inject
+    private UserSession session;
+    
+    /**
      * Current selected directory.
      */
     private DirectoryWrapper currentDir;
@@ -74,6 +93,20 @@ public class EventHandler implements Serializable {
      * Editor form visibility flag.
      */
     private Boolean enableEdit = false;
+    
+    /**
+     * Current edit header of note.<br/>
+     * If this is new note, header is empty. 
+     * If there is exists note, its header will be used.
+     */
+    private String currentEditHeader;
+    
+    /**
+     * Current note edit text.<br/>
+     * If this is new note, text is empty.
+     * If there is note, last version text will taken.
+     */
+    private String currentEditText;
 
     /**
      * Get current directory wrapper.
@@ -162,6 +195,8 @@ public class EventHandler implements Serializable {
     public void onDirSelected(NodeSelectEvent e) {
         this.enableEdit = false;
         this.currentDir = ((DirectoryWrapper) e.getTreeNode());
+        Directory newWrapped = directoryBean.find(currentDir.getWrapped().getId());
+        this.currentDir.setWrapped(newWrapped);
         this.currentNote = null;
         this.currentVersion = null;
     }
@@ -174,7 +209,8 @@ public class EventHandler implements Serializable {
         this.enableEdit = false;
         Note eventNote = (Note) e.getObject();
         this.currentNote = noteBean.find(eventNote.getId());
-        this.currentVersion = versionBean.find(eventNote.getLastVersionId().getId());
+        this.currentVersion = versionBean.find(currentNote.getVersionList().get(currentNote.getVersionList().size() - 1).getId());
+        this.currentVersionId = this.currentVersion.getId();
     }
     
     /**
@@ -207,5 +243,65 @@ public class EventHandler implements Serializable {
         } else {
             return "";
         }
+    }
+    
+    /**
+     * Set edited text to temp variable.
+     * @param currentEditText user edited text;
+     */
+    public void setCurrentEditText(String currentEditText) {
+        this.currentEditText = currentEditText;
+    }
+    
+    /**
+     * @return the currentEditHeader
+     */
+    public String getCurrentEditHeader() {
+        if (this.currentNote != null) {
+            return noteBean.find(this.currentNote.getId()).getHeader();
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * @param currentEditHeader the currentEditHeader to set
+     */
+    public void setCurrentEditHeader(String currentEditHeader) {
+        this.currentEditHeader = currentEditHeader;
+    }
+    
+    /**
+     * Save new version of note or create new note with edited version.
+     */
+    public void saveNewVersion() {
+        Version newVersion = new Version();
+        newVersion.setNoteText(currentEditText);
+        newVersion.setSaveDate(new Date());
+        newVersion.setHash(Hash.getHash(currentEditText));
+        newVersion.setUserId(session.getCurrentUser());
+        newVersion.setNoteId(currentNote);
+        versionBean.create(newVersion);
+        
+        currentNote.setHeader(currentEditHeader);
+        currentNote.setLastVersionId(newVersion);
+        currentNote.getVersionList().add(newVersion);
+        currentNote.setLastVersionDate(newVersion.getSaveDate());
+        noteBean.edit(currentNote);
+        
+        Directory newWrapped = directoryBean.find(currentDir.getWrapped().getId());
+        this.currentDir.setWrapped(newWrapped);
+        
+        this.currentVersion = newVersion;
+        this.currentVersionId = newVersion.getId();
+        this.enableEdit = false;
+    }
+    
+    /**
+     * Cancel new version creating, back to view mode.
+     */
+    public void dropNewVersion() {
+        this.currentEditText = null;
+        this.enableEdit = false;
     }
 }

@@ -39,7 +39,7 @@ public class DirectoryWrapper implements TreeNode, Serializable {
      * Wrapped directory instance.
      * @see org.devnote.entries.Directory
      */
-    private final Directory wrapped;
+    private Directory wrapped;
     
     /**
      * Parent of this node.
@@ -174,10 +174,18 @@ public class DirectoryWrapper implements TreeNode, Serializable {
     
     /**
      * Get wrapped directory.
-     * @return directory inside wrapper.
+     * @return directory inside wrapper;
      */
     public Directory getWrapped() {
         return this.wrapped;
+    }
+    
+    /**
+     * Set wrapped directory.
+     * @param wrapped refreshed directory;
+     */
+    public void setWrapped(Directory wrapped) {
+        this.wrapped = wrapped;
     }
     
     @Override
