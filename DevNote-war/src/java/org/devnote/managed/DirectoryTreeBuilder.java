@@ -24,6 +24,8 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.bean.ManagedProperty;
+import javax.inject.Inject;
 import javax.inject.Named;
 import org.devnote.ejb.DirectoryFacadeLocal;
 import org.devnote.entries.Directory;
@@ -45,6 +47,13 @@ public class DirectoryTreeBuilder implements Serializable {
     private DirectoryFacadeLocal dirBean;
     
     /**
+     * User session bean.
+     */
+    @Inject
+    @ManagedProperty(value="#{userSession}")
+    private UserSession session;
+    
+    /**
      * Tree structure root directory.
      */
     private TreeNode root;
@@ -63,7 +72,7 @@ public class DirectoryTreeBuilder implements Serializable {
         
         Map<String, TreeNode> pathMap = new HashMap<>();
         
-        List<Directory> sortedDirs = dirBean.findAllSortByPath();
+        List<Directory> sortedDirs = dirBean.findAllSortByPath(session.getCurrentUser());
         if (sortedDirs.isEmpty()) {
             System.err.println("LIST EMPTY!");
         }

@@ -49,7 +49,7 @@ import javax.validation.constraints.Size;
 @Table(name = "Directory")
 @NamedQueries({
     @NamedQuery(name = "Directory.findAll", query = "SELECT d FROM Directory d"),
-    @NamedQuery(name = "Directory.findAllSortPath", query = "SELECT d FROM Directory d ORDER BY d.path"),
+    @NamedQuery(name = "Directory.findAllSortPath", query = "SELECT d FROM Directory d WHERE d.userId = :userId ORDER BY d.path"),
     @NamedQuery(name = "Directory.findById", query = "SELECT d FROM Directory d WHERE d.id = :id")})
 public class Directory implements Serializable {
     

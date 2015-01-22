@@ -23,6 +23,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import org.devnote.entries.Directory;
+import org.devnote.entries.User;
 
 /**
  * Directory facade.
@@ -50,8 +51,11 @@ public class DirectoryFacade extends AbstractFacade<Directory> implements Direct
     }
 
     @Override
-    public List<Directory> findAllSortByPath() {
-        return this.getEntityManager().createNamedQuery("Directory.findAllSortPath", Directory.class).getResultList();
+    public List<Directory> findAllSortByPath(User userId) {
+        EntityManager em = this.getEntityManager();
+        TypedQuery<Directory> tr = em.createNamedQuery("Directory.findAllSortPath", Directory.class);
+        tr.setParameter("userId", userId);
+        return tr.getResultList();
     }
     
 }

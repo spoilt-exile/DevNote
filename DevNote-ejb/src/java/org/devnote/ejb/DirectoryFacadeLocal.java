@@ -20,6 +20,7 @@ package org.devnote.ejb;
 import java.util.List;
 import javax.ejb.Local;
 import org.devnote.entries.Directory;
+import org.devnote.entries.User;
 
 /**
  * Directory local interface.
@@ -50,6 +51,6 @@ public interface DirectoryFacadeLocal {
      * Find directories but sorted by path. Useful for creating tree.
      * @return list of directories sorted by path;
      */
-    List<Directory> findAllSortByPath();
+    List<Directory> findAllSortByPath(User userId);
     
 }
